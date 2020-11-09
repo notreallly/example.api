@@ -25,6 +25,15 @@ public class CallMeSenPaiController {
 	public SenPai noticeMe(@Valid @RequestBody Question question) {
 		return new SenPai(question.getQ());
 	}
+	
+	@RequestMapping(value = "/CallMeSenPai", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@JsonView(SenPai.Public.class)
+	@ResponseBody
+	public SenPai noticeMe() {
+		SenPai sp = new SenPai();
+		sp.setAnswer("SenPai won't notice you unless you use the POST method!");
+		return sp;
+	}
 
 	@ExceptionHandler
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -40,6 +49,7 @@ public class CallMeSenPaiController {
 
 		private final String defaultAnswer = "SenPai noticed you just now!";
 		private String question;
+		private String answer;
 
 		public SenPai() {
 		}
@@ -47,13 +57,22 @@ public class CallMeSenPaiController {
 		public SenPai(String question) {
 			this.question = question;
 		}
+		
+		public void setAnswer(String answer) {
+			this.answer = answer;
+		}
 
 		@JsonView(SenPai.Public.class)
 		public String getAnswer() {
-			if (question.toLowerCase().contains("senpai"))
-				return defaultAnswer;
+			
+			if (answer != null)
+				return answer;
+			else if (question.toLowerCase().contains("senpai"))
+				answer = defaultAnswer;
 			else
-				return "SenPai responsed you \"" + question + "\" just now!";
+				answer = "SenPai responsed you \"" + question + "\" just now!";
+			
+			return answer;
 		}
 	}
 }
